@@ -99,7 +99,7 @@ with Game() as bot:
 
 
     # ### Ball-by-Ball info
-    Info.extract_ball_by_ball(bot,switch)
+    #Info.extract_ball_by_ball(bot,switch)
     
     # print("Ball-by-Ball info is saved in ball_by_ball.csv file")
 
