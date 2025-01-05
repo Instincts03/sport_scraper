@@ -65,89 +65,91 @@ class Info:
 
     def schedule(driver, switch):
         try:
-
             # Read match links from the CSV file
             with open(f'temp/{switch}_match_link.csv', 'r') as csvfile:
                 reader = csv.reader(csvfile)
                 matches_links = [row[0] for row in reader]
-
-            # Modify links to include '/info/switch'
-            modified_links = [link + f'/info/{switch}' for link in matches_links]
-
-            # Iterate through each modified link and open it
-            for link in modified_links:
-                driver.get(link)
-                time.sleep(2)
-
-                # Locate match details using the new HTML structure
-                match_details = driver.find_elements(By.CSS_SELECTOR, ".table_row")
-                #print(f"Match details found: {len(match_details)}")
-
-                if match_details:
-                    # Conditional logic for different switches
-                    i=0
-                    try:
-                        # Extract match information from the second t_col tag in each row
-                        t_col = match_details[i].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-
-                        # Conditional handling based on the switch
-                        if switch in ['completed', 'live']:
-                            # Extract match name, date, time, and venue for 'completed' or 'live'
-                            match_info = t_col.split(',')
-                            match = match_info[0].strip()  # Match name
-                            match_number = match_info[1].strip() if len(match_info) > 1 else "N/A"  # Match number (if available)
-
-                            # Extract date, time, and venue based on the switch
-                            date_text = match_details[i + 2].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-                            time_text = match_details[i + 3].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-                            venue = match_details[i + 5].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-
-                        elif switch == 'upcoming':
-                            # Extract match name, date, time, and venue for 'upcoming'
-                            match_info = t_col.split(',')
-                            match = match_info[0].strip()  # Match name
-                            match_number = match_info[1].strip() if len(match_info) > 1 else "N/A"  # Match number (if available)
-
-                            # Extract date, time, and venue based on the switch
-                            date_text = match_details[i + 2].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-                            time_text = match_details[i + 3].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-                            venue = match_details[i + 4].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
-
-                        # Extract day
-                        day = date_text.split(',')[0].strip()
-
-                        # Combine date and time for UTC conversion
-                        local_datetime = datetime.strptime(f"{date_text} {time_text}", "%A, %b-%d, %Y %I:%M %p")
-                        ist_tz = timezone("Asia/Kolkata")  # IST timezone
-                        local_datetime = ist_tz.localize(local_datetime)
-                        utc_datetime = local_datetime.astimezone(timezone("UTC"))
-                        
-                        file_exists = os.path.isfile('schedule.csv')
-
-                        # Append match details to CSV
-                        with open('schedule.csv', 'a', newline='') as csvfile:
-                            fieldnames = ['Match', 'Match Number', 'Day', 'Date (UTC)', 'Time (UTC)', 'Venue']
-                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                            
-                            if not file_exists:
-                                writer.writeheader()
-
-                            # Write match details
-                            writer.writerow({
-                                'Match': match,
-                                'Match Number': match_number,
-                                'Day': day,
-                                'Date (UTC)': utc_datetime.strftime("%Y-%m-%d"),
-                                'Time (UTC)': utc_datetime.strftime("%H:%M"),
-                                'Venue': venue
-                            })
-                    except Exception as e:
-                        print(f"Error processing match details at index {i}: {e}")
-                else:
-                    print(f"No match details available in the {switch} section.")
+        except:
+            #print(f"no {switch} matches found")
+            return
             
-        except Exception as e:
-            print(f"An error occurred while scraping match details: {e}")
+
+        # Modify links to include '/info/switch'
+        modified_links = [link + f'/info/{switch}' for link in matches_links]
+
+        # Iterate through each modified link and open it
+        for link in modified_links:
+            driver.get(link)
+            time.sleep(2)
+
+            # Locate match details using the new HTML structure
+            match_details = driver.find_elements(By.CSS_SELECTOR, ".table_row")
+            #print(f"Match details found: {len(match_details)}")
+
+            if match_details:
+                # Conditional logic for different switches
+                i=0
+                try:
+                    # Extract match information from the second t_col tag in each row
+                    t_col = match_details[i].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+
+                    # Conditional handling based on the switch
+                    if switch in ['completed', 'live']:
+                        # Extract match name, date, time, and venue for 'completed' or 'live'
+                        match_info = t_col.split(',')
+                        match = match_info[0].strip()  # Match name
+                        match_number = match_info[1].strip() if len(match_info) > 1 else "N/A"  # Match number (if available)
+
+                        # Extract date, time, and venue based on the switch
+                        date_text = match_details[i + 2].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+                        time_text = match_details[i + 3].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+                        venue = match_details[i + 5].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+
+                    elif switch == 'upcoming':
+                        # Extract match name, date, time, and venue for 'upcoming'
+                        match_info = t_col.split(',')
+                        match = match_info[0].strip()  # Match name
+                        match_number = match_info[1].strip() if len(match_info) > 1 else "N/A"  # Match number (if available)
+
+                        # Extract date, time, and venue based on the switch
+                        date_text = match_details[i + 2].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+                        time_text = match_details[i + 3].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+                        venue = match_details[i + 4].find_elements(By.CSS_SELECTOR, ".t_col")[1].text.strip()
+
+                    # Extract day
+                    day = date_text.split(',')[0].strip()
+
+                    # Combine date and time for UTC conversion
+                    local_datetime = datetime.strptime(f"{date_text} {time_text}", "%A, %b-%d, %Y %I:%M %p")
+                    ist_tz = timezone("Asia/Kolkata")  # IST timezone
+                    local_datetime = ist_tz.localize(local_datetime)
+                    utc_datetime = local_datetime.astimezone(timezone("UTC"))
+                    
+                    file_exists = os.path.isfile('schedule.csv')
+
+                    # Append match details to CSV
+                    with open('schedule.csv', 'a', newline='') as csvfile:
+                        fieldnames = ['Match', 'Match Number', 'Day', 'Date (UTC)', 'Time (UTC)', 'Venue']
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                        
+                        if not file_exists:
+                            writer.writeheader()
+
+                        # Write match details
+                        writer.writerow({
+                            'Match': match,
+                            'Match Number': match_number,
+                            'Day': day,
+                            'Date (UTC)': utc_datetime.strftime("%Y-%m-%d"),
+                            'Time (UTC)': utc_datetime.strftime("%H:%M"),
+                            'Venue': venue
+                        })
+                except Exception as e:
+                    print(f"Error processing match details at index {i}: {e}")
+            else:
+                print(f"No match details available in the {switch} section.")
+    
+
 
             
     
@@ -335,8 +337,6 @@ class Info:
             csv_file = os.path.join('temp', 'live_match_link.csv') if switch == 'live' else os.path.join('temp', 'completed_match_link.csv')
             output_folder = 'players'
             os.makedirs(output_folder, exist_ok=True)
-            temp_folder = 'temp'
-            os.makedirs(temp_folder, exist_ok=True)
 
             if not os.path.exists(csv_file):
                 print(f"CSV file not found: {csv_file}")
@@ -353,7 +353,7 @@ class Info:
 
                 try:
                     output_file = os.path.join(output_folder, f"match_{idx}_squads.csv")
-                    player_dict_file = os.path.join(temp_folder, f"match_{idx}_players.json")
+                    player_dict_file = os.path.join('temp', f"match_{idx}_players.json")
 
                     with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
                         writer = csv.writer(csvfile)

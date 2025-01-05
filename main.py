@@ -8,112 +8,112 @@ from scraper import Info
 import time
 import csv
 
-# series = input("Enter the series ID (numeric only): ").strip()
-# if not series.isdigit():
-#     print("Error: Series ID must be a numeric value.")
-#     exit()
+series = input("Enter the series ID (numeric only): ").strip()
+if not series.isdigit():
+    print("Error: Series ID must be a numeric value.")
+    exit()
 
-# switch = input("Enter the switch ('live' or 'completed'): ").strip().lower()
-# if switch not in ["live", "completed"]:
-#     print("Error: Switch must be either 'live' or 'completed'.")
-#     exit() 
+switch = input("Enter the switch ('live' or 'completed'): ").strip().lower()
+if switch not in ["live", "completed"]:
+    print("Error: Switch must be either 'live' or 'completed'.")
+    exit() 
 
-series = '10850'
-switch = 'completed'
+# series = '10850'
+# switch = 'completed'
 BASE_LINK = f"https://www.sportstiger.com/cricket/series/matches/{series}/"
 
-# squad = f"https://www.sportstiger.com/cricket/series/squad/{series}/"
+squad = f"https://www.sportstiger.com/cricket/series/squad/{series}/"
 
 
 
 with Game() as bot:
     
-    # ###Get the teams playing in the tournament
+    ###Get the teams playing in the tournament
 
-    # bot.squads(squad)
-    # time.sleep(1)
-    # teams=Info.scrape_team_names(bot)
-    # with open('teams.csv', 'w', newline='') as csvfile:
-    #     writer = csv.writer(csvfile)
-    #     writer.writerows([[team] for team in teams]) 
+    bot.squads(squad)
+    time.sleep(1)
+    teams=Info.scrape_team_names(bot)
+    with open('teams.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows([[team] for team in teams]) 
         
-    # print("Teams playing in the tournament are saved in teams.csv file")
+    print("Teams playing in the tournament are saved in teams.csv file")
 
 
 
-    # ### Squad for each team
+    ### Squad for each team
 
-    # input_csv = 'teams.csv'
-    # output_csv = 'teams_players.csv'
-    # bot.squads(squad)
+    input_csv = 'teams.csv'
+    output_csv = 'teams_players.csv'
+    bot.squads(squad)
 
-    # with open(input_csv, 'r') as csvfile:
-    #     reader = csv.reader(csvfile)
-    #     team_names = [row[0] for row in reader]
+    with open(input_csv, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        team_names = [row[0] for row in reader]
 
-    # with open(output_csv, 'w', newline='') as csvfile:
-    #     writer = csv.writer(csvfile)
-    #     writer.writerow(['Team Name', 'Player Name', 'Designation']) 
+    with open(output_csv, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Team Name', 'Player Name', 'Designation']) 
 
-    #     first_team = team_names[0]
-    #     team_data = Info.scrape_players_for_team(bot, first_team)
-    #     for player_name, designation in team_data:
-    #         writer.writerow([first_team, player_name, designation])
+        first_team = team_names[0]
+        team_data = Info.scrape_players_for_team(bot, first_team)
+        for player_name, designation in team_data:
+            writer.writerow([first_team, player_name, designation])
 
-    #     for team in team_names[1:]:
-    #         bot.click_team(team)
-    #         team_data = Info.scrape_players_for_team(bot, team)
-    #         for player_name, designation in team_data:
-    #             writer.writerow([team, player_name, designation])
+        for team in team_names[1:]:
+            bot.click_team(team)
+            team_data = Info.scrape_players_for_team(bot, team)
+            for player_name, designation in team_data:
+                writer.writerow([team, player_name, designation])
     
-    # print("Players for each team are saved in teams_players.csv file")
+    print("Players for each team are saved in teams_players.csv file")
 
 
         
-    # ###Get links of the matches
-    # bot.land_first_page(BASE_LINK)
-    # time.sleep(2)
+    ###Get links of the matches
+    bot.land_first_page(BASE_LINK)
+    time.sleep(2)
 
-    # bot.click_result_button()
-    # time.sleep(2)
-    # Info.matches_links(bot, switch='completed')
+    bot.click_result_button()
+    time.sleep(2)
+    Info.matches_links(bot, switch='completed')
 
-    # bot.click_live_button()
-    # time.sleep(2)
-    # Info.matches_links(bot,switch='live')
+    bot.click_live_button()
+    time.sleep(2)
+    Info.matches_links(bot,switch='live')
 
-    # bot.click_upcoming_button()
-    # time.sleep(2)
-    # Info.matches_links(bot,switch='upcoming')
+    bot.click_upcoming_button()
+    time.sleep(2)
+    Info.matches_links(bot,switch='upcoming')
     
-    # print("Schedule of the matches are saved in schedule.csv file")
+    print("links of the matches are saved in schedule.csv file")
     
     
     
-    # ### Get schedule of the matches
+    ### Get schedule of the matches
     
-    # Info.schedule(bot, switch='completed')
-    # Info.schedule(bot,switch='live')
-    # Info.schedule(bot,switch='upcoming')
-
-
-
-    # ### Ball-by-Ball info
-    #Info.extract_ball_by_ball(bot,switch)
+    Info.schedule(bot, switch='completed')
+    Info.schedule(bot,switch='live')
+    Info.schedule(bot,switch='upcoming')
     
-    # print("Ball-by-Ball info is saved in ball_by_ball.csv file")
 
-
-
-    # ### Scoreboard
-    #Info.extract_and_save_scoreboards(bot)
+    ### Playing 11 and benched players
+    Info.players(bot,switch)
     
-    # print("Scoreboard is saved in scoreboard.csv file")
-
-    # ### Playing 11 and benched players
-    #Info.players(bot,switch)
+    print("Playing 11 and benched players are saved in playing_11.csv file")
     
-    # print("Playing 11 and benched players are saved in playing_11.csv file")
+
+    ### Scoreboard
+    Info.extract_and_save_scoreboards(bot,switch)
+    
+    print("Scoreboard is saved in scoreboard.csv file")
+    
+    
+        
+    ### Ball-by-Ball info
+    Info.extract_ball_by_ball(bot,switch)
+    
+    print("Ball-by-Ball info is saved in ball_by_ball.csv file")
     
     
     
